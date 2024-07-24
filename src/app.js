@@ -15,24 +15,29 @@ const app = express();
 
 routes(app);
 
-const corsOptions = {
-    origin: 'http://localhost:5173', // Atualize com a URL do seu frontend
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'], // Certifique-se de que 'Content-Type' e 'Authorization' estão permitidos
-};
+// Configura o CORS para permitir requisições do seu domínio
+app.use(cors({
+    origin: 'https://jrgcleres.com.br'
+}));
 
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     origin: 'http://localhost:5173', // Atualize com a URL do seu frontend
+//     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'], // Certifique-se de que 'Content-Type' e 'Authorization' estão permitidos
+// };
 
-// Middleware para adicionar cabeçalhos CORS manualmente
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    // Responder a solicitações preflight
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(204);
-    }
-    next();
-});
+// app.use(cors(corsOptions));
+
+// // Middleware para adicionar cabeçalhos CORS manualmente
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+//     res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//     // Responder a solicitações preflight
+//     if (req.method === 'OPTIONS') {
+//         return res.sendStatus(204);
+//     }
+//     next();
+// });
 
 export default app;
