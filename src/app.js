@@ -1,6 +1,6 @@
-import express from 'express'
-import conectaNaDataBase from './config/dbConnect.js'
-import routes from './routes/index.js'
+import express from 'express';
+import conectaNaDataBase from './config/dbConnect.js';
+import routes from './routes/index.js';
 import cors from 'cors';
 
 const conexao = await conectaNaDataBase();
@@ -9,11 +9,9 @@ conexao.on("error", (erro) => {
 });
 conexao.once("open", () => {
     console.log('Conexão com o banco feita com sucesso');
-})
+});
 
 const app = express();
-
-routes(app);
 
 // Permitir todas as origens
 app.use(cors());
@@ -28,7 +26,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Suas outras configurações de middleware e rotas
+// Suas outras configurações de middleware
 app.use(express.json());
+
+// Definir as rotas após configurar o CORS e outros middlewares
+routes(app);
 
 export default app;
