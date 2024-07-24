@@ -17,7 +17,7 @@ routes(app);
 
 // Configura o CORS para permitir requisições do seu domínio
 app.use(cors({
-    origin: 'https://jrgcleres.com.br'
+    origin: 'https://jrgcleres.com.br/tickethouse'
 }));
 
 // const corsOptions = {
