@@ -15,29 +15,20 @@ const app = express();
 
 routes(app);
 
-// Configura o CORS para permitir requisições do seu domínio
-app.use(cors({
-    origin: 'https://jrgcleres.com.br/tickethouse'
-}));
+// Permitir todas as origens
+app.use(cors());
 
-// const corsOptions = {
-//     origin: 'http://localhost:5173', // Atualize com a URL do seu frontend
-//     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-//     allowedHeaders: ['Content-Type', 'Authorization'], // Certifique-se de que 'Content-Type' e 'Authorization' estão permitidos
-// };
+// Permitir métodos específicos e cabeçalhos
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
 
-// app.use(cors(corsOptions));
-
-// // Middleware para adicionar cabeçalhos CORS manualmente
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-//     res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//     // Responder a solicitações preflight
-//     if (req.method === 'OPTIONS') {
-//         return res.sendStatus(204);
-//     }
-//     next();
-// });
+// Suas outras configurações de middleware e rotas
+app.use(express.json());
 
 export default app;
