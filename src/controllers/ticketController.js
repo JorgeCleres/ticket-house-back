@@ -7,7 +7,7 @@ class TicketController {
             const novoTicket = await ticket.create(req.body);
             res.status(201).json({
                 message: 'Criado com sucesso',
-                ticket: novoTicket
+                data: novoTicket
             });
         } catch (erro) {
             res.status(400).json({
@@ -31,13 +31,11 @@ class TicketController {
         try {
             const id = req.params.id;
             const ticketDeleted = await ticket.findByIdAndDelete(id)
-    
             if (!ticketDeleted) {
                 return res.status(404).json({
                     message: 'Ticket não encontrado'
                 });
             }
-    
             res.status(200).json({
                 message: 'Ticket excluído com sucesso'
             });
@@ -51,21 +49,18 @@ class TicketController {
     static atualizarTicket = async (req, res) => {
         try {
             const id = req.params.id;
-            const ticketUpdate = await ticket.findByIdAndUpdate(id, req.body)
-    
-            if (!ticketUpdate) {
-                return res.status(404).json({
-                    message: 'Ticket não encontrado'
-                });
+            const ticketExistente = await ticket.findById(id);
+            if (!ticketExistente) {
+                return res.status(404).json({ message: 'Ticket não encontrado' });
             }
-    
+            const ticketUpdate = await ticket.findByIdAndUpdate(id, req.body, { new: true });
             res.status(200).json({
-                message: 'Ticket atualizado com sucesso'
+                message: 'Ticket atualizado com sucesso',
+                data: ticketUpdate
             });
-        } catch {
-            res.status(500).json(
-                { message: `falha ao atualizar ticket`}
-            )
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Falha ao atualizar ticket' });
         }
     }
 }

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { describe, expect, it, jest} from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import app from '../../app.js'
 
 
@@ -16,10 +16,10 @@ describe('POST em /tickets', () => {
         const novoTicket = {
             solicitante: "Giovana",
             solicitado: "Jorge",
-            titulo: "Arrumar torneira",
+            tarefa: "Arrumar torneira",
             descricao: "Arrumar as torneiras da lavanderia",
-            dataInicio: "2024-07-19",
-            dataFim: "2024-07-28"
+            dataFim: "2024-07-28",
+            status: 1
         };
 
         const resp = await request(app)
@@ -90,8 +90,8 @@ describe('Deve atulizar o ticket', () => {
 
     it('Deve retornar Ticket não encontrado', async () => {
         const resp = await request(app)
-        .put(`/tickets/669a970f0aade1f442d91ba6`)
-			.expect(404);
+            .put(`/tickets/669a970f0aade1f442d91ba6`)
+            .expect(404);
 
         expect(resp.body.message).toBe('Ticket não encontrado');
     })
@@ -107,16 +107,16 @@ describe('Deve deletar o ticket pelo id', () => {
 
     it('Deve retornar Ticket excluído com sucesso', async () => {
         const resp = await request(app)
-			.delete(`/tickets/${idResposta}`)
-			.expect(200);
+            .delete(`/tickets/${idResposta}`)
+            .expect(200);
 
         expect(resp.body.message).toBe('Ticket excluído com sucesso');
     })
 
     it('Deve retornar Ticket não encontrado', async () => {
         const resp = await request(app)
-        .delete(`/tickets/${idResposta}`)
-			.expect(404);
+            .delete(`/tickets/${idResposta}`)
+            .expect(404);
 
         expect(resp.body.message).toBe('Ticket não encontrado');
     })
