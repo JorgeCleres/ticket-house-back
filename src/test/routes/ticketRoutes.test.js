@@ -2,7 +2,6 @@ import request from 'supertest';
 import { describe, expect, it, jest } from '@jest/globals';
 import app from '../../app.js'
 
-
 let idResposta;
 describe('POST em /tickets', () => {
     let conexao;
@@ -27,7 +26,7 @@ describe('POST em /tickets', () => {
             .send(novoTicket)
             .expect(201);
 
-        idResposta = resp.body.ticket._id;
+        idResposta = resp.body.data._id;
         expect(resp.body.message).toBe('Criado com sucesso');
     });
 
@@ -55,7 +54,7 @@ describe('GET em /tickets', () => {
             .expect('content-type', /json/)
             .expect(200);
 
-        expect(resp.body[0].solicitante).toEqual('Giovana')
+        expect(resp.body[0].solicitante).toEqual('Jorge')
     })
 
     it('Deve retornar undefined', async () => {
@@ -77,7 +76,7 @@ describe('Deve atulizar o ticket', () => {
 
     it('Deve retornar Ticket atualizado com sucesso', async () => {
         const ticket = {
-            solicitado: "Juju"
+            solicitado: "Ninja"
         };
 
         const resp = await request(app)

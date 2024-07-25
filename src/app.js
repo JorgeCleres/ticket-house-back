@@ -2,6 +2,9 @@ import express from 'express';
 import conectaNaDataBase from './config/dbConnect.js';
 import routes from './routes/index.js';
 import cors from 'cors';
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const conexao = await conectaNaDataBase();
 conexao.on("error", (erro) => {
