@@ -18,7 +18,14 @@ class TicketController {
 
     static listarTickets = async (req, res) => {
         try {
-            const listaTickets = await ticket.find()
+            const grupo = req.params.grupo;
+
+            console.log(grupo);
+            
+            const listaTickets = await ticket.find({grupo})
+            
+            console.log(listaTickets);
+
             res.status(200).json(listaTickets)
         } catch ( erro ) {
             res.status(500).json({

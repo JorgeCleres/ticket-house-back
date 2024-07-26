@@ -25,7 +25,12 @@ class Usuario {
             const email = req.body.email
             const password = req.body.password
             const user = await User.findByCredentials(email, password)
-            //gerando um token
+            if (!user) {
+                return res.status(400).json({ 
+                    message: 'Erro ao realizar o login, verificar se o email e senha estão corretos' 
+                });
+            }
+
             const token = await user.generateAuthToken()
             res.status(201).json({ message: 'Usuário logado com sucesso', user, token })
 
