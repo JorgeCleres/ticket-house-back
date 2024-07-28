@@ -6,8 +6,8 @@ const router = express.Router();
 
 router
     .get('/tickets/:grupo', auth, ticketController.listarTickets)
-    .post('/tickets', ticketController.cadastrarTicket)
-    .delete("/tickets/:id", ticketController.excluirTicket)
-    .put("/tickets/:id", ticketController.atualizarTicket)
+    .post('/tickets', auth, ticketController.cadastrarTicket)
+    .delete("/tickets/:id", auth, ticketController.excluirTicket)
+    .put("/tickets/:id", auth, ticketController.atualizarTicket)
 
 export default router;

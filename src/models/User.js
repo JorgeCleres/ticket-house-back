@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     nome: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    grupo: { type: Number }, // Remover `required: true` se o valor for opcional
+    grupo: { type: Number },
     tokens: [
         { 
             token: { type: String, required: true }

@@ -53,6 +53,18 @@ class Usuario {
             })
         }
     }
+
+    static getUsuarios = async (req, res) => {
+        try {
+            const grupo = req.params.grupo;
+            const listaUsuarios = await User.find({ grupo }).select('nome');
+            res.status(200).json(listaUsuarios);
+        } catch ( erro ) {
+            res.status(500).json({
+                message: `falha na requisição`
+            })
+        }
+    }
 }
 
 export default Usuario;
