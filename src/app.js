@@ -2,9 +2,9 @@ import express from 'express';
 import conectaNaDataBase from './config/dbConnect.js';
 import routes from './routes/index.js';
 import cors from 'cors';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
 const conexao = await conectaNaDataBase();
 conexao.on("error", (erro) => {
@@ -16,8 +16,14 @@ conexao.once("open", () => {
 
 const app = express();
 
-// Permitir todas as origens
-app.use(cors());
+// Configurar CORS para múltiplas origens
+const corsOptions = {
+    origin: ['https://jrgcleres.com.br', 'http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 
 // Permitir métodos específicos e cabeçalhos
 app.use((req, res, next) => {
