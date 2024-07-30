@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     grupo: { type: Number },
+    adm: { type: Number, default: 0 },
     tokens: [
         { 
             token: { type: String, required: true }

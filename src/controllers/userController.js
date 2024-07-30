@@ -1,10 +1,12 @@
 import User from '../models/User.js'
+import bcrypt from 'bcrypt';
 
 class Usuario {
 
     static cadastrarUsuario = async (req, res) => {
         try {
             let isUser = await User.find({ email: req.body.email })
+
             if(isUser.length > 0) {
                 return res.status(400).json({ message: 'Desculpe, esse email já está registrado'})
             }
@@ -57,8 +59,35 @@ class Usuario {
     static getUsuarios = async (req, res) => {
         try {
             const grupo = req.params.grupo;
-            const listaUsuarios = await User.find({ grupo }).select('nome');
+            const listaUsuarios = await User.find({ grupo }).select('nome email adm');
             res.status(200).json(listaUsuarios);
+        } catch ( erro ) {
+            res.status(500).json({
+                message: `falha na requisição`
+            })
+        }
+    }
+
+    static editarUsuario = async (req, res) => {
+        try {
+            const id = req.params.id;
+
+            if (req.body.password) {
+                const salt = await bcrypt.genSalt(10);
+                req.body.password = await bcrypt.hash(req.body.password, salt);
+            }
+
+            const userUpdate = await User.findByIdAndUpdate(id, req.body, { new: true });
+
+            if (!userUpdate) {
+                return res.status(404).json({ message: 'Usuário não encontrado' });
+            }
+
+            // Retorna a resposta com o usuário atualizado
+            res.status(200).json({
+                message: 'Usuário atualizado com sucesso',
+                data: userUpdate
+            });
         } catch ( erro ) {
             res.status(500).json({
                 message: `falha na requisição`
