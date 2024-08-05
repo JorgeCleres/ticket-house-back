@@ -1,5 +1,9 @@
 import User from '../models/User.js'
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class Usuario {
 
@@ -11,10 +15,10 @@ class Usuario {
                 return res.status(400).json({ message: 'Desculpe, esse email já está registrado'})
             }
             const newUser = new User(req.body)
-            const user = await newUser.save();
+            const data = await newUser.save();
             const token = await newUser.generateAuthToken()
 
-            res.status(201).json({ message: 'Usuário registrado com sucesso', user, token })
+            res.status(201).json({ message: 'Usuário registrado com sucesso', data, token })
         } catch(erro) {
             res.status(400).json({
                 message: 'Erro ao registrar usuário'
@@ -92,6 +96,101 @@ class Usuario {
             res.status(500).json({
                 message: `falha na requisição`
             })
+        }
+    }
+
+    static removeUsuario = async (req, res) => {
+        try {
+            const id = req.params.id;
+            const user = await User.findByIdAndDelete(id)
+
+            if (!user) {
+                return res.status(404).json({
+                    message: 'Usuário não encontrado'
+                });
+            }
+            res.status(200).json({
+                message: 'Usuário excluído com sucesso'
+            });
+
+        } catch (erro) {
+            res.status(500).json({
+                message: `falha ao excluir usuário`
+            })
+        }
+    }
+
+    static recuperarSenha = async (req, res) => {
+        try {
+            let user = await User.findOne({ email: req.body.email });
+            if (!user) {
+                return res.status(404).json({
+                    message: 'Usuário não encontrado'
+                });
+            }
+
+            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '30m' });
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 1800000; // 30 minutos
+            await user.save(); // Salva as alterações no banco de dados
+
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.titan.email',
+                port: 587,
+                auth: {
+                    user: process.env.EMAIL,
+                    pass: process.env.MAIL_PASSWORD
+                }
+            });
+
+            const mailOptions = {
+                to: user.email,
+                from: process.env.EMAIL,
+                subject: 'Recuperação de senha',
+                text: `Você está recebendo isso porque você (ou alguém) solicitou a redefinição da senha da sua conta.\n\n` +
+                      `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
+                      `http://${req.headers.host}/Reset/${token}\n\n` +
+                      `Se você não solicitou isso, ignore este email e sua senha permanecerá inalterada.\n`
+            };
+
+            transporter.sendMail(mailOptions, (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Erro ao enviar email de recuperação' });
+                }
+                res.status(200).json({ message: 'Email de recuperação enviado com sucesso' });
+            });
+
+            return true
+
+        } catch (erro) {
+            res.status(500).json({
+                message: `${erro} Falha ao recuperar senha`
+            });
+        }
+    }
+
+    static redefinirSenha = async (req, res) => {
+        try {
+            const token = req.params.token;
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            let user = await User.findOne({ _id: decoded._id, resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+            if (!user) {
+                return res.status(400).json({
+                    message: 'Token de redefinição de senha inválido ou expirado'
+                });
+            }
+
+            user.password = await req.body.password;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+
+            res.status(200).json({ message: 'Senha redefinida com sucesso' });
+        } catch (erro) {
+            res.status(500).json({
+                message: 'Falha ao redefinir senha'
+            });
         }
     }
 }

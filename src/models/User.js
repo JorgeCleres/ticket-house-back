@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     grupo: { type: Number },
     adm: { type: Number, default: 0 },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     tokens: [
         { 
             token: { type: String, required: true }
