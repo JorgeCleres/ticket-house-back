@@ -1,8 +1,8 @@
 import User from '../models/User.js'
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import SendEmail from '../service/sendEmail.js';
 dotenv.config();
 
 class Usuario {
@@ -11,15 +11,15 @@ class Usuario {
         try {
             let isUser = await User.find({ email: req.body.email })
 
-            if(isUser.length > 0) {
-                return res.status(400).json({ message: 'Desculpe, esse email já está registrado'})
+            if (isUser.length > 0) {
+                return res.status(400).json({ message: 'Desculpe, esse email já está registrado' })
             }
             const newUser = new User(req.body)
             const data = await newUser.save();
             const token = await newUser.generateAuthToken()
 
             res.status(201).json({ message: 'Usuário registrado com sucesso', data, token })
-        } catch(erro) {
+        } catch (erro) {
             res.status(400).json({
                 message: 'Erro ao registrar usuário'
             })
@@ -32,15 +32,15 @@ class Usuario {
             const password = req.body.password
             const user = await User.findByCredentials(email, password)
             if (!user) {
-                return res.status(400).json({ 
-                    message: 'Erro ao realizar o login, verificar se o email e senha estão corretos' 
+                return res.status(400).json({
+                    message: 'Erro ao realizar o login, verificar se o email e senha estão corretos'
                 });
             }
 
             const token = await user.generateAuthToken()
             res.status(201).json({ message: 'Usuário logado com sucesso', user, token })
 
-        } catch(erro) {
+        } catch (erro) {
             res.status(400).json({
                 message: 'Erro ao realizar o login, verificar se o email e senha estão corretos'
             })
@@ -65,7 +65,7 @@ class Usuario {
             const grupo = req.params.grupo;
             const listaUsuarios = await User.find({ grupo }).select('nome email adm');
             res.status(200).json(listaUsuarios);
-        } catch ( erro ) {
+        } catch (erro) {
             res.status(500).json({
                 message: `falha na requisição`
             })
@@ -92,7 +92,7 @@ class Usuario {
                 message: 'Usuário atualizado com sucesso',
                 data: userUpdate
             });
-        } catch ( erro ) {
+        } catch (erro) {
             res.status(500).json({
                 message: `falha na requisição`
             })
@@ -131,37 +131,12 @@ class Usuario {
 
             const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '30m' });
             user.resetPasswordToken = token;
-            user.resetPasswordExpires = Date.now() + 1800000; // 30 minutos
-            await user.save(); // Salva as alterações no banco de dados
-
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.titan.email',
-                port: 587,
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.MAIL_PASSWORD
-                }
+            user.resetPasswordExpires = Date.now() + 1800000;
+            await user.save();
+            SendEmail.notificacaoRecuperacaoSenha(user, token)
+            res.status(201).json({
+                message: 'Email enviado com sucesso'
             });
-
-            const mailOptions = {
-                to: user.email,
-                from: process.env.EMAIL,
-                subject: 'Recuperação de senha',
-                text: `Você está recebendo isso porque você (ou alguém) solicitou a redefinição da senha da sua conta.\n\n` +
-                      `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
-                      `http://${req.headers.host}/Reset/${token}\n\n` +
-                      `Se você não solicitou isso, ignore este email e sua senha permanecerá inalterada.\n`
-            };
-
-            transporter.sendMail(mailOptions, (err) => {
-                if (err) {
-                    return res.status(500).json({ message: 'Erro ao enviar email de recuperação' });
-                }
-                res.status(200).json({ message: 'Email de recuperação enviado com sucesso' });
-            });
-
-            return true
-
         } catch (erro) {
             res.status(500).json({
                 message: `${erro} Falha ao recuperar senha`

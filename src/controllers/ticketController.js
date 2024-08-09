@@ -1,10 +1,16 @@
 import { ticket } from '../models/Ticket.js';
+import User from '../models/User.js'
+import SendEmail from '../service/sendEmail.js';
 
 class TicketController {
 
     static cadastrarTicket = async (req, res) => {
         try {
             const novoTicket = await ticket.create(req.body);
+            let isUser = await User.find({ nome: req.body.solicitado })
+
+            SendEmail.notificacaoTicket(req.body, isUser[0])
+
             res.status(201).json({
                 message: 'Criado com sucesso',
                 data: novoTicket
@@ -19,9 +25,9 @@ class TicketController {
     static listarTickets = async (req, res) => {
         try {
             const grupo = req.params.grupo;
-            const listaTickets = await ticket.find({grupo})
+            const listaTickets = await ticket.find({ grupo })
             res.status(200).json(listaTickets)
-        } catch ( erro ) {
+        } catch (erro) {
             res.status(500).json({
                 message: `falha na requisição`
             })
