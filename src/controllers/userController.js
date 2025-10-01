@@ -8,6 +8,15 @@ dotenv.config();
 class Usuario {
 
     static cadastrarUsuario = async (req, res) => {
+
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+        console.log('cadastrarUsuario');
+
         try {
             let isUser = await User.find({ email: req.body.email })
 
@@ -73,6 +82,7 @@ class Usuario {
     }
 
     static editarUsuario = async (req, res) => {
+        
         try {
             const id = req.params.id;
 
