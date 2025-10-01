@@ -4,6 +4,13 @@ import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
+console.log('dsadas');
+console.log('dsadas');
+console.log('dsadas');
+console.log('dsadas');
+console.log('dsadas');
+console.log('dsadas');
+
 router
     .post('/esqueceusenha', userController.recuperarSenha)
     .post('/redefinirSenha/:token', userController.redefinirSenha )

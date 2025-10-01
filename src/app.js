@@ -18,7 +18,7 @@ const app = express();
 
 // Configurar CORS para múltiplas origens
 const corsOptions = {
-    origin: ['https://jrgcleres.com.br', 'http://localhost:5173'],
+    origin: ['https://www.jrgcleres.com.br/tickethouse', 'https://www.jrgcleres.com.br', 'http://localhost:5173', 'https://hhouse.onrender.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
